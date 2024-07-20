@@ -45,18 +45,18 @@
 // Class uses following external libraries:
 //  Blitz++ library        (https://github.com/blitzpp/blitz)
 //  GNU scientific library (https://www.gnu.org/software/gsl)
-//  netcdf-c++ library     (https://github.com/Unidata/netcdf-cxx4)
+//  Netcdf-c library       (https://github.com/Unidata/netcdf-c)
 
 // Author:
 // Richard Fitzpatrick,
 // Institute of Fusion Studies,
-// Department of Physics
+// Department of Physics,
 // University of Texas at Austin
 // rfitzp@utexas.edu
 
 // Source: https://github.com/rfitzp/Equilibrium/
 
-// Documentation: ../Documentation/Equiiibrium.pdf
+// Documentation: ../Documentation/Equilibrium.pdf
 
 // ########################################################################################
 

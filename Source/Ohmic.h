@@ -4,8 +4,7 @@
 // Class to represent poloidal ohmic field-coil made up of 29 toroidal strands
 // ###########################################################################
 
-#ifndef OHMIC
-#define OHMIC
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -83,4 +82,3 @@ class Ohmic
  private:
 };
 
-#endif //OHMIC

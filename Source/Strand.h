@@ -4,8 +4,7 @@
 // Class to represent single toroidal strand of poloidal magnetic field-coil
 // #########################################################################
 
-#ifndef STRAND
-#define STRAND
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,4 +61,3 @@ class Strand
   double GetEta (double _R, double _Z);
 };
 
-#endif //STRAND

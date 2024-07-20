@@ -4,8 +4,7 @@
 // Class to represent poloidal magnetic field-coil made up of five toroidal strands
 // ################################################################################
 
-#ifndef COIL
-#define COIL
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -58,5 +57,3 @@ class Coil
 
  private:
 };
-
-#endif //COIL
