@@ -97,7 +97,7 @@ subroutine NameListRead (QC, NU, PC, MU, EPSA,&
        EPS, NS, NR, NF, NW,&
        ACC, H0, HMIN, HMAX
        
-  open  (unit = 100, file = 'Inputs/Equilibrium.nml', status = 'old')
+  open  (unit = 100, file = 'Inputs/Namelist.nml', status = 'old')
   read  (unit = 100, nml  = EQUILIBRIUM_CONTROL)
   close (unit = 100)
 

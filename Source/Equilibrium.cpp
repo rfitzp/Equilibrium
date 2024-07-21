@@ -241,6 +241,9 @@ Equilibrium::Equilibrium ()
       printf ("Equilibrium:: Error - hmax must exceed hmin\n");
       exit (1);
     }
+
+  printf ("\nqc = %10.3e nu = %10.3e mu = %10.3e epsa = %10.3e Hshift = %10.3e Vshift = %10.3e\n",
+	  qc, nu, pc, mu, epsa, Hshift, Vshift);
 }
 
 // ###########
@@ -499,23 +502,23 @@ void Equilibrium::Solve ()
       double Fsin  = Vfaco + Vfac1 + Vfac2 + Vfac3 + Vfac4 + Vfac5 + Vfac6;
       
       printf ("\n");
-      printf ("B_v = %11.4e  Fsin = %11.4e\n\n", - epsa * (f1a/2.) * (log (8./epsa) - 1.5 - H1a), Fsin);
-      printf ("Ohmic  :  R = %11.4e  Z = %11.4e  Hfac = %11.4e  Vfac = %11.4e  It  = %11.4e\n",
-	      Ro + Hshift, Zo - vshift, Hfaco, Vfaco, Ito);
-      printf ("Coil 1 :  R = %11.4e  Z = %11.4e  Hfac = %11.4e  Vfac = %11.4e  It  = %11.4e\n",
-	      R1 + Hshift, Z1 - vshift, Hfac1, Vfac1, It1);
-      printf ("Coil 2 :  R = %11.4e  Z = %11.4e  Hfac = %11.4e  Vfac = %11.4e  It  = %11.4e\n",
-	      R2 + Hshift, Z2 - vshift, Hfac2, Vfac2, It2);
-      printf ("Coil 3 :  R = %11.4e  Z = %11.4e  Hfac = %11.4e  Vfac = %11.4e  It  = %11.4e\n",
-	      R3 + Hshift, Z3 - vshift, Hfac3, Vfac3, It3);
-      printf ("Coil 4 :  R = %11.4e  Z = %11.4e  Hfac = %11.4e  Vfac = %11.4e  It  = %11.4e\n",
-	      R4 + Hshift, Z4 - vshift, Hfac4, Vfac4, It4);
-      printf ("Coil 5 :  R = %11.4e  Z = %11.4e  Hfac = %11.4e  Vfac = %11.4e  It  = %11.4e\n",
-	      R5 + Hshift, Z5 - vshift, Hfac5, Vfac5, It5);
-      printf ("Coil 6 :  R = %11.4e  Z = %11.4e  Hfac = %11.4e  Vfac = %11.4e  It  = %11.4e\n",
-	      R6 + Hshift, Z6 - vshift, Hfac6, Vfac6, It6);
+      printf ("Ohmic  :  R = %10.3e  Z = %10.3e  W = %10.3e  Hfac = %10.3e  Vfac = %10.3e  It  = %10.3e\n",
+	      Ro + Hshift, Zo - vshift, Wo, Hfaco, Vfaco, Ito);
+      printf ("Coil 1 :  R = %10.3e  Z = %10.3e  W = %10.3e  Hfac = %10.3e  Vfac = %10.3e  It  = %10.3e\n",
+	      R1 + Hshift, Z1 - vshift, W1, Hfac1, Vfac1, It1);
+      printf ("Coil 2 :  R = %10.3e  Z = %10.3e  W = %10.3e  Hfac = %10.3e  Vfac = %10.3e  It  = %10.3e\n",
+	      R2 + Hshift, Z2 - vshift, W2, Hfac2, Vfac2, It2);
+      printf ("Coil 3 :  R = %10.3e  Z = %10.3e  W = %10.3e  Hfac = %10.3e  Vfac = %10.3e  It  = %10.3e\n",
+	      R3 + Hshift, Z3 - vshift, W3, Hfac3, Vfac3, It3);
+      printf ("Coil 4 :  R = %10.3e  Z = %10.3e  W = %10.3e  Hfac = %10.3e  Vfac = %10.3e  It  = %10.3e\n",
+	      R4 + Hshift, Z4 - vshift, W4, Hfac4, Vfac4, It4);
+      printf ("Coil 5 :  R = %10.3e  Z = %10.3e  W = %10.3e  Hfac = %10.3e  Vfac = %10.3e  It  = %10.3e\n",
+	      R5 + Hshift, Z5 - vshift, W5, Hfac5, Vfac5, It5);
+      printf ("Coil 6 :  R = %10.3e  Z = %10.3e  W = %10.3e  Hfac = %10.3e  Vfac = %10.3e  It  = %10.3e\n",
+	      R6 + Hshift, Z6 - vshift, W6, Hfac6, Vfac6, It6);
       printf ("\n");
-  
+      printf ("B_v = %10.3e  Fsin = %10.3e\n\n", - epsa * (f1a/2.) * (log (8./epsa) - 1.5 - H1a), Fsin);
+ 
       // .........................
       // Rescale shaping functions
       // .........................
@@ -544,7 +547,7 @@ void Equilibrium::Solve ()
 	      VPfunc(n, i) = VPfunc(n, i) * Vnfc; 
 	    }
 	  
-	  printf ("n = %3d:  Hfac = %11.4e  Vfac = %11.4e  Hna = %11.4e  Vna = %11.4e\n",
+	  printf ("n = %3d:  Hfac = %10.3e  Vfac = %10.3e  Hna = %10.3e  Vna = %10.3e\n",
 		  n, Hnfac, Vnfac, HHfunc(n, Nr), VVfunc(n, Nr));
 	}
     }
@@ -575,7 +578,7 @@ void Equilibrium::Solve ()
       double H1a = HPfunc(1, Nr);
 		 
       printf ("\n");
-      printf ("B_v = %11.4e\n\n", - epsa * (f1a/2.) * (log (8./epsa) - 1.5 - H1a));
+      printf ("B_v = %10.3e\n\n", - epsa * (f1a/2.) * (log (8./epsa) - 1.5 - H1a));
   
       // .........................
       // Rescale shaping functions
@@ -610,7 +613,7 @@ void Equilibrium::Solve ()
 	      VPfunc(n, i) = VPfunc(n, i) * Vnfc /VPfunc(n, Nr); 
 	    }
 
-	  printf ("n = %3d:  Hna = %11.4e  Vna = %11.4e  qnc = %11.4e  qns = %11.4e\n",
+	  printf ("n = %3d:  Hna = %10.3e  Vna = %10.3e  qnc = %10.3e  qns = %10.3e\n",
 		  n, Hnfc, Vnfc, qnc, qns);
 	}
 
@@ -750,7 +753,7 @@ void Equilibrium::Solve ()
     }
 
   printf ("\n");
-  printf ("q2c = %11.4e  q0a  = %11.4e  q2a  = %11.4e  Ip = %11.4e  It = %11.4e\n",
+  printf ("q2c = %10.3e  q0a  = %10.3e  q2a  = %10.3e  Ip = %10.3e  It = %10.3e\n",
 	  q2[0], q0[Nr], q2[Nr], Ip[Nr], It[Nr]);
   
   // ..........................
