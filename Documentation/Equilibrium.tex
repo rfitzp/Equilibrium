@@ -12,7 +12,7 @@
 \author{R.~Fitzpatrick\,\footnote{rfitzp@utexas.edu}}
 \affiliation{Institute for Fusion Studies,  Department of Physics,  University of Texas at Austin,  Austin TX 78712, USA}
 \begin{abstract}
-Following Greene, Johnson \& Weimer  [Phys.\  Fluids  {\bf 14}, 671 (1971)] and Connor, Hastie, et alia [Phys.\ Plasmas {\bf 31}, 577 (1988); Plasma Phys.\ Control.\ Fusion {\bf 34}, 161 (1992); Nucl.\ Fusion {\bf 33}, 1553 (1993)],  the
+Following Greene, Johnson \& Weimer  [Phys.\  Fluids  {\bf 14}, 671 (1971)] and Connor, Hastie, et alia [Phys.\ Plasmas {\bf 31}, 577 (1988); Plasma Phys.\ Control.\ Fusion {\bf 34}, 161 (1992); Nucl.\ Fusion {\bf 33}, 1533 (1993)],  the
 Grad-Shafranov equation for an axisymmetric tokamak plasma equilibrium  is solved via an expansion in the, supposedly small,  inverse aspect-ratio of the plasma, $\epsilon$. 
 The displacements of equilibrium magnetic flux-surfaces due to plasma shaping are assumed to be ${\cal O}(\epsilon)$ smaller than the minor radii
 of the surfaces, but no other restriction is placed on the nature of the shaping. The solution of the Grad-Shafranov
@@ -376,7 +376,7 @@ in the near-vacuum region. Here,
 \hat{V}_{n\,a+} &= \frac{\hat{V}_{n\,a}'-(n+1)\,\hat{V}_{n\,a}}{2\,n}.
 \end{align}
 Moreover, $\hat{H}_{n\,a}=\hat{H}_n(1)$, $\hat{H}_{n\,a}'=\hat{H}_n'(1)$, $\hat{V}_{n\,a}=\hat{V}_n(1)$,
-and $\hat{V}_{n\,a}'=\hat{V}_n(1)$  are constants determined from the solutions of Eqs.~(\ref{e27})--(\ref{e28}) in the plasma interior,
+and $\hat{V}_{n\,a}'=\hat{V}_n'(1)$  are constants determined from the solutions of Eqs.~(\ref{e27})--(\ref{e28}) in the plasma interior,
 subject to the boundary conditions (\ref{e38vv})--(\ref{e40vv}).  It follows from Eqs.~(\ref{e30}), (\ref{e31}),  (\ref{e39c}), and (\ref{e34}) that
 \begin{align}\label{e58g}
 f_3'(\hat{r})& = -\frac{f_{1\,a}}{\hat{r}}\left(\frac{3\,\hat{r}^{\,2}}{2}-2\,\hat{r}\,\hat{H}_1' +\sum_{n>0}\left[\hat{H}_n'^{\,2}+2\,(n^2-1)\,\frac{\hat{H}_n'\,\hat{H}_n}{\hat{r}}-(n^2-1)\,\frac{\hat{H}_n^{\,2}}{\hat{r}^{\,2}}\right]\right.\nonumber\\[0.5ex]
@@ -735,7 +735,7 @@ where ${\bf e}_R =\nabla R$ and ${\bf e}_Z=\nabla Z$. Hence,
 &\phantom{=} - \epsilon\,2\,f_{1\,a}\,\hat{H}_{2\,a-}\,(\hat{z}\,{\bf e}_R+\hat{x}\,{\bf e}_Z)
 - \epsilon\,2\,f_{1\,a}\,\hat{V}_{2\,a-}\,(\hat{x}\,{\bf e}_R-\hat{z}\,{\bf e}_Z)\\[0.5ex]
 &\phantom{=} + \epsilon\,3\,f_{1\,a}\,\hat{H}_{3\,a-}\left[2\,\hat{x}\,\hat{z}\,{\bf e}_R + (\hat{x}^{\,2}-\hat{z}^{\,2})\,{\bf e}_Z\right]
- + \epsilon\,3\,f_{1\,a}\,\hat{V}_{3\,a-}\left[ (\hat{x}^{\,2}-\hat{z}^{\,2})\,{\bf e}_Z-2\,\hat{x}\,\hat{z}\,{\bf e}_R\right].\nonumber
+ + \epsilon\,3\,f_{1\,a}\,\hat{V}_{3\,a-}\left[ (\hat{x}^{\,2}-\hat{z}^{\,2})\,{\bf e}_R-2\,\hat{x}\,\hat{z}\,{\bf e}_Z\right].\nonumber
 \end{align}
  Here, the first term on the 
 right-hand side of the previous equation is the vertical field that counteracts the hoop stress in the plasma torus.\cite{greene,fred} The second term is the
@@ -819,7 +819,7 @@ where
 \end{equation}
 The solution of Eq.~(\ref{e138}) that is well-behaved as $z\rightarrow 1$ and $z\rightarrow\infty$, and is continuous at $z=z_x$, is\,\cite{abram,abrama}
 \begin{equation}
-\chi_{c\,n}(z) = A_n\left\{\begin{array}{ccc} Q_{n-1/2}^1(z_x)\,P_{n-1/2}^1(z)&~~~~&z<z_x\\[0.5ex]
+\chi_{x\,n}(z) = A_n\left\{\begin{array}{ccc} Q_{n-1/2}^1(z_x)\,P_{n-1/2}^1(z)&~~~~&z<z_x\\[0.5ex]
  Q_{n-1/2}^1(z)\,P_{n-1/2}^1(z_x)&&z>z_x\end{array}\right..
 \end{equation}
 Integration of Eq.~(\ref{e138}) across $z=z_x$ reveals that
@@ -1061,17 +1061,17 @@ The digital data used in the figures in this paper can be obtained from the auth
 
 \bibitem{greene} J.M.~Greene, J.L.~Johnson, and K.E.~Weimer,  Phys.\  Fluids  {\bf 14}, 671 (1971).
 
-\bibitem{shaf} V.D.~Shafranov, Atomnaya \'{E}nergiya {\bf 3}, 521  (1962).
+\bibitem{shaf} V.D.~Shafranov, Sov.\ At.\ Energ.\ {\bf 13}, 1149 (1963).
 
 \bibitem{wesson} J.A.~Wesson, and D.J.~Campbell, {\em Tokamaks}, 4th ed. (Oxford University Press, Oxford UK, 2011)
 
 \bibitem{con0} J.W.~Connor, and R.J.~Hastie, {\em The Effect of Shaped Plasma Cross Sections on the Ideal Kink Mode in a Tokamak}. (Rep. CLM-M106, Culham Laboratory, Abingdon UK, 1985)
 
-\bibitem{con}  J.W.~Connor, S.C.~Cowley, R.J.~Hastie, T.C.~Hender, A.~Hood, and T.J.~Martin, Phys.\ Plasmas {\bf 31}, 577 (1988).
+\bibitem{con}  J.W.~Connor, S.C.~Cowley, R.J.~Hastie, T.C.~Hender, A.~Hood, and T.J.~Martin, Phys.\ Fluids {\bf 31}, 577 (1988).
 
 \bibitem{gim} R.~Fitzpatrick, C.G.~Gimblett, and R.J.~Hastie, Plasma Phys.\ Control.\ Fusion {\bf 34}, 161 (1992). 
 
-\bibitem{fitz93} R.~Fitzpatrick, R.J.~Hastie, T.J.~Martin, and C.M.~Roach,  Nucl.\ Fusion {\bf 33}, 1553 (1993).
+\bibitem{fitz93} R.~Fitzpatrick, R.J.~Hastie, T.J.~Martin, and C.M.~Roach,  Nucl.\ Fusion {\bf 33}, 1533 (1993).
 
 \bibitem{helena} G.T.A.~Huysmans, J.P.~Goedbloed, and W.~Kerner, Int.\ J.\ Mod. Phys. C,  {\bf 2}, 371 (1991).
 
@@ -1081,11 +1081,11 @@ The digital data used in the figures in this paper can be obtained from the auth
 
 \bibitem{model} A.J~Cerfon, J.P.~Freidberg, Phys.\  Plasmas  {\bf 17},  032502 (2010).
 
-\bibitem{model1} L.~Guazzotto, J.P.~Freidberg, J.\  Plasma Phys.\ {\bf 87}  905870305 (2021).
+\bibitem{model1} L.~Guazzotto, J.P.~Freidberg, J.\  Plasma Phys.\ {\bf 87},  905870305 (2021).
 
 \bibitem{fred} J.F.~Freidberg, {\em Ideal Magnetohydrodynamics}. (Plenum Press, New York NY, 1987)
 
-\bibitem{xu} T.~Xu, and R.~Fitzpatrick, Nucl.\ Fusion {\bf 59}  064002 (2019).
+\bibitem{xu} T.~Xu, and R.~Fitzpatrick, Nucl.\ Fusion {\bf 59},  064002 (2019).
 
 \bibitem{liu} J.~Liu, P.~Zhu, and H.~Li, Phys.\ Plasmas  {\bf 29}, 084502 (2022).  
 
