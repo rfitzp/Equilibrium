@@ -61,22 +61,74 @@ Equilibrium::Equilibrium ()
   bb64 = 44275./110592.;
   bb65 =   253./4096.;
 
-  // -----------------------------------------
-  // Read namelist file Inputs/Equilibrium.nml
-  // -----------------------------------------
-  NameListRead (&qc, &nu, &pc, &mu, &epsa,
-		&CFLAG, 
-		&Hshift, &Vshift,
-		&Ro, &Zo, &dRo, &Wo,
-		&R1, &Z1, &dR1, &W1,
-		&R2, &Z2, &dR2, &W2,
-		&R3, &Z3, &dR3, &W3,
-		&R4, &Z4, &dR4, &W4,
-		&R5, &Z5, &dR5, &W5,
-		&R6, &Z6, &dR6, &W6,
-		&Pped, &wped, &rped,
-		&eps, &Ns, &Nr, &Nf, &Nw,
-		&acc, &h0, &hmin, &hmax);
+  // --------------------------------------
+  // Read control parameters from JSON file
+  // --------------------------------------
+  string JSONFilename = "Inputs/Equilibrium.json";
+  json   JSONData     = ReadJSONFile (JSONFilename);
+ 
+  qc    = JSONData["qc"]   .get<double> ();
+  nu    = JSONData["nu"]   .get<double> ();
+  pc    = JSONData["pc"]   .get<double> ();
+  mu    = JSONData["mu"]   .get<double> ();
+  CFLAG = JSONData["CFLAG"].get<int> ();
+  epsa  = JSONData["epsa"] .get<double> ();
+  eps   = JSONData["eps"]  .get<double> ();
+  Ns    = JSONData["Ns"]   .get<int> ();
+  Nr    = JSONData["Nr"]   .get<int> ();
+  Nf    = JSONData["Nf"]   .get<int> ();
+  Nw    = JSONData["Nw"]   .get<int> ();
+  acc   = JSONData["acc"]  .get<double> ();
+  h0    = JSONData["h0"]   .get<double> ();
+  hmin  = JSONData["hmin"] .get<double> ();
+  hmax  = JSONData["hmax"] .get<double> ();
+
+  Hshift =  JSONData["Hshift"] .get<double> ();
+  Vshift =  JSONData["Vshift"] .get<double> ();
+  
+  Ro  = JSONData["Ohmic"]["R"] .get<double> ();
+  Zo  = JSONData["Ohmic"]["Z"] .get<double> ();
+  dRo = JSONData["Ohmic"]["dR"].get<double> ();
+  Wo  = JSONData["Ohmic"]["W"] .get<double> ();
+
+  R1  = JSONData["Coil1"]["R"] .get<double> ();
+  Z1  = JSONData["Coil1"]["Z"] .get<double> ();
+  dR1 = JSONData["Coil1"]["dR"].get<double> ();
+  W1  = JSONData["Coil1"]["W"] .get<double> ();
+
+  R2  = JSONData["Coil2"]["R"] .get<double> ();
+  Z2  = JSONData["Coil2"]["Z"] .get<double> ();
+  dR2 = JSONData["Coil2"]["dR"].get<double> ();
+  W2  = JSONData["Coil2"]["W"] .get<double> ();
+
+  R3  = JSONData["Coil3"]["R"] .get<double> ();
+  Z3  = JSONData["Coil3"]["Z"] .get<double> ();
+  dR3 = JSONData["Coil3"]["dR"].get<double> ();
+  W3  = JSONData["Coil3"]["W"] .get<double> ();
+
+  R4  = JSONData["Coil4"]["R"] .get<double> ();
+  Z4  = JSONData["Coil4"]["Z"] .get<double> ();
+  dR4 = JSONData["Coil4"]["dR"].get<double> ();
+  W4  = JSONData["Coil4"]["W"] .get<double> ();
+
+  R5  = JSONData["Coil5"]["R"] .get<double> ();
+  Z5  = JSONData["Coil5"]["Z"] .get<double> ();
+  dR5 = JSONData["Coil5"]["dR"].get<double> ();
+  W5  = JSONData["Coil5"]["W"] .get<double> ();
+
+  R6  = JSONData["Coil6"]["R"] .get<double> ();
+  Z6  = JSONData["Coil6"]["Z"] .get<double> ();
+  dR6 = JSONData["Coil6"]["dR"].get<double> ();
+  W6  = JSONData["Coil6"]["W"] .get<double> ();
+
+  for (const auto& number : JSONData["Equilibrium_control"]["Hna"])
+    {
+      Hna.push_back (number.get<double> ());
+    }
+  for (const auto& number : JSONData["Equilibrium_control"]["Vna"])
+    {
+      Vna.push_back (number.get<double> ());
+    }
 
   // ............
   // Sanity check
@@ -241,8 +293,13 @@ Equilibrium::Equilibrium ()
       printf ("Equilibrium:: Error - hmax must exceed hmin\n");
       exit (1);
     }
+   if (Hna.size() != Vna.size())
+    {
+      printf ("Equilibrium:: Error - Hna and Van arrays must be the same size\n");
+      exit (1);
+    }
 
-  printf ("\nqc = %10.3e nu = %10.3e mu = %10.3e epsa = %10.3e Hshift = %10.3e Vshift = %10.3e\n",
+  printf ("\nqc = %10.3e nu = %10.3e pc = %10.3e mu = %10.3e epsa = %10.3e Hshift = %10.3e Vshift = %10.3e\n",
 	  qc, nu, pc, mu, epsa, Hshift, Vshift);
 }
 
@@ -553,23 +610,18 @@ void Equilibrium::Solve ()
     }
   else
     {
-      // ............................................
-      // Read shaping data from file Inputs/Shape.txt
-      // ............................................
-      int     nshape;
-      double  hnax, vnax;
-      FILE*   file = OpenFiler ("Inputs/Shape.txt");
-      double* hna  = new double[nshape+2];
-      double* vna  = new double[nshape+2];
+      // .....................
+      // Set edge shaping data
+      // .....................
+      int     nshape = Hna.size();
+      double* hna    = new double[nshape+2];
+      double* vna    = new double[nshape+2];
 
-      fscanf (file, "%d", &nshape);
       for (int i = 0; i < nshape; i++)
 	{
-	  fscanf (file, "%lf %lf", &hnax, &vnax);
-	  hna[i+2] = hnax;
-	  vna[i+2] = vnax;
+	  hna[i+2] = Hna[i];
+	  vna[i+2] = Vna[i];
 	}
-      fclose (file);
 
       if (nshape > Ns)
 	nshape = Ns;
@@ -587,7 +639,6 @@ void Equilibrium::Solve ()
 	{
 	  double Hnam = (HPfunc(n, Nr) + double (n - 1) * HHfunc(n, Nr)) /double (2*n);
 	  double Vnam = (VPfunc(n, Nr) + double (n - 1) * VVfunc(n, Nr)) /double (2*n);
-
 
 	  double Hnfc, Vnfc;
 	  if (n <= nshape+1)
@@ -1433,6 +1484,36 @@ void Equilibrium::Ridder (double x1, double x2, double F1, double F2, double& x)
     } 
   // Iterate until absolute change in x falls below Eta
   while (fabs (x - xold) > Eta && fabs(Fx) > Eta && iter < Maxiter); 
+}
+
+// ##########################
+// Function to read JSON file
+// ##########################
+json Equilibrium::ReadJSONFile (const string& filename)
+{
+  ifstream JSONFile (filename);
+  json     JSONData;
+
+  if (JSONFile.is_open ())
+    {
+      try
+	{
+	  JSONFile >> JSONData;
+        }
+      catch (json::parse_error& e)
+	{
+	  cerr << "Unable to parse JSON file: " << e.what() << endl;
+	  exit (1);
+        }
+      JSONFile.close ();
+    }
+  else
+    {
+      cerr << "Unable to open JSON file: " << filename << endl;
+      exit (1);
+    }
+
+  return JSONData;
 }
 
 // #####################################

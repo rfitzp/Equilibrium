@@ -6,7 +6,7 @@
 // All lengths (except r) normalized to R_0 (major radius of magnetic axis).
 // All magnetic field-strengths normalized to B_0 (on-axis toroidal magnetic field).
 // Radial coordinate, r, normalized to epsa * R_0, where eps_a is inverse-aspect ratio.
-// So r=0 corresponds to magnetic axis, and r=1 to plasma/vacuum interface.
+// So r = 0 is magnetic axis, and r = 1 is plasma/vacuum interface.
 
 // Flux-surfaces:
 
@@ -30,21 +30,18 @@
 // nu * qc is lowest-order safety-factor at plasma/vacuum interface.
 
 // Inputs:
-//  Inputs/Namelist.nml - namelist
-//  Inputs/Shape.txt    - nlines (i.e. no of subsequent lines to be read)
-//                        H2a V2a
-//                        H3a V3a
-//                        etc.
+//  Inputs/Equilibrium.json - JSON file
 
 // Outputs:
 //  Plots/Equilibrium.nc
 
-// Plots:
+// Ploting scripts:
 //  Plots/*.py
 
 // Class uses following external libraries:
 //  Blitz++ library        (https://github.com/blitzpp/blitz)
 //  GNU scientific library (https://www.gnu.org/software/gsl)
+//  nclohmann JSON library (https://github.com/nlohmann/json)
 //  Netcdf-c library       (https://github.com/Unidata/netcdf-c)
 
 // Author:
@@ -66,30 +63,21 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <math.h>
+#include <vector>
+#include <iostream>
+#include <fstream>
 
 #include <blitz/array.h>
 #include <gsl/gsl_spline.h>
+#include <nlohmann/json.hpp>
 #include <netcdf.h>
 
 #include "Coil.h"
 #include "Ohmic.h"
 
 using namespace blitz;
+using           json = nlohmann::json;
 
-// Namelist reading function
-extern "C" void NameListRead (double* QC, double* NU, double* PC, double* MU, double* EPSA,
-			      int* CFLAG, double* HSFT, double* VSFT, 
-			      double* RO, double* ZO, double* DRO, double* WO,
-			      double* R1, double* Z1, double* DR1, double* W1,
-			      double* R2, double* Z2, double* DR2, double* W2,
-			      double* R3, double* Z3, double* DR3, double* W3,
-			      double* R4, double* Z4, double* DR4, double* W4,
-			      double* R5, double* Z5, double* DR5, double* W5,
-			      double* R6, double* Z6, double* DR6, double* W6,
-			      double* PPED, double* WPED, double* RPED,
-			      double* EPS, int* NS, int* NR, int* NF, int* NW,
-			      double* ACC, double* H0, double* HMIN, double* HMAX);
-    
 // ############
 // Class header
 // ############
@@ -100,72 +88,72 @@ class Equilibrium
   // ------------------
   // Physics parameters
   // ------------------
-  double qc;     // Safety-factor on magnetic axis (read from namelist)
-  double nu;     // Current peaking parameter (read from namelist)
-  double pc;     // Normalized plasma pressure on magnetic axis (read from namelist)
-  double mu;     // Pressure peaking parameter (read from namelist)
-  double epsa;   // Inverse aspect-ratio of plasma (read from namelist)
+  double qc;          // Safety-factor on magnetic axis (read from JSON file)
+  double nu;          // Current peaking parameter (read from JSON file)
+  double pc;          // Normalized plasma pressure on magnetic axis (read from JSON file)
+  double mu;          // Pressure peaking parameter (read from JSON file)
+  double epsa;        // Inverse aspect-ratio of plasma (read from JSON file)
+  vector<double> Hna; // H2(1), H3(1), etc (read from JSON file)
+  vector<double> Vna; // V2(1), V3(1), etc (read from JSON file)
+  
+  double Pped;   // Normalized height of pedestal (read from JSON file)
+  double wped;   // Normalized width of pedestal (read from JSON file)
+  double rped;   // Normalized radius of pedestal (read from JSON file)
 
-  double Pped;   // Normalized height of pedestal (read from namelist)
-  double wped;   // Normalized width of pedestal (read from namelist)
-  double rped;   // Normalized radius of pedestal (read from namelist)
+  int    CFLAG;  // Flag for inclusion of external coils (read from JSON file)
+                 //  If not set then shaping data determined from Hna and Vna values in JSON file
 
-  int    CFLAG;  // Flag for inclusion of external coils (read from namelist)
-                 //  If not set then shaping data read from Inputs/Shape.txt in format
-                 //   int nshape
-                 //   double Hna double Vna (for i = 0, nshape-1; shaping index n is i + 2)
-
-  double Hshift; // Horizontal shift of magnetic axis (read from namelist)
+  double Hshift; // Horizontal shift of magnetic axis (read from JSON file)
   double Vshift; // Search for vertical shift of magnetic axis
-                 //  takes place for shifts in  range -Vshift to +Vshift (read from namelist)
+                 //  takes place for shifts in range -Vshift to +Vshift (read from JSON file)
 
   Ohmic  ohmic;  // Ohmic heating coil
-  double Ro;     // R coordinate of ohmic heating coil (read from namelist)
-  double Zo;     // Height of ohmic heating coil (read from namelist)
-  double dRo;    // Width of ohmic heating coil (read from namelist)
-  double Wo;     // Relative current in ohmic heating coil (read from namelist)
+  double Ro;     // R coordinate of ohmic heating coil (read from JSON file)
+  double Zo;     // Height of ohmic heating coil (read from JSON file)
+  double dRo;    // Width of ohmic heating coil (read from JSON file)
+  double Wo;     // Relative current in ohmic heating coil (read from JSON file)
   double Ito;    // Actual current in ohmic heating coil
 
   Coil   coil1;  // Poloidal field-coil 1
-  double R1;     // R coordinate of poloidal field-coil 1 (read from namelist)
-  double Z1;     // Z coordinate of poloidal field-coil 1 (read from namelist)
-  double dR1;    // Size of poloidal field-coil 1 (read from namelist)
-  double W1;     // Relative current in poloidal field-coil 1 (read from namelist)
+  double R1;     // R coordinate of poloidal field-coil 1 (read from JSON file)
+  double Z1;     // Z coordinate of poloidal field-coil 1 (read from JSON file)
+  double dR1;    // Size of poloidal field-coil 1 (read from JSON file)
+  double W1;     // Relative current in poloidal field-coil 1 (read from JSON file)
   double It1;    // Actual current in poloidal field-coil 1 
 
   Coil   coil2;  // Poloidal field-coil 2
-  double R2;     // R coordinate of poloidal field-coil 2 (read from namelist)
-  double Z2;     // Z coordinate of poloidal field-coil 2 (read from namelist)
-  double dR2;    // Size of poloidal field-coil 2 (read from namelist)
-  double W2;     // Relative current in poloidal field-coil 2 (read from namelist)
+  double R2;     // R coordinate of poloidal field-coil 2 (read from JSON file)
+  double Z2;     // Z coordinate of poloidal field-coil 2 (read from JSON file)
+  double dR2;    // Size of poloidal field-coil 2 (read from JSON file)
+  double W2;     // Relative current in poloidal field-coil 2 (read from JSON file)
   double It2;    // Actual current in poloidal field-coil 2
 
   Coil   coil3;  // Poloidal field-coil 3
-  double R3;     // R coordinate of poloidal field-coil 3 (read from namelist)
-  double Z3;     // Z coordinate of poloidal field-coil 3 (read from namelist)
-  double dR3;    // Size of poloidal field-coil 3 (read from namelist)
-  double W3;     // Relative current in poloidal field-coil 3 (read from namelist)
+  double R3;     // R coordinate of poloidal field-coil 3 (read from JSON file)
+  double Z3;     // Z coordinate of poloidal field-coil 3 (read from JSON file)
+  double dR3;    // Size of poloidal field-coil 3 (read from JSON file)
+  double W3;     // Relative current in poloidal field-coil 3 (read from JSON file)
   double It3;    // Actual current in poloidal field-coil 3
 
   Coil   coil4;  // Poloidal field-coil 4
-  double R4;     // R coordinate of poloidal field-coil 4 (read from namelist)
-  double Z4;     // Z coordinate of poloidal field-coil 4 (read from namelist)
-  double dR4;    // Size of poloidal field-coil 4 (read from namelist)
-  double W4;     // Relative current in poloidal field-coil 4 (read from namelist)
+  double R4;     // R coordinate of poloidal field-coil 4 (read from JSON file)
+  double Z4;     // Z coordinate of poloidal field-coil 4 (read from JSON file)
+  double dR4;    // Size of poloidal field-coil 4 (read from JSON file)
+  double W4;     // Relative current in poloidal field-coil 4 (read from JSON file)
   double It4;    // Actual current in poloidal field-coil 4
 
   Coil   coil5;  // Poloidal field-coil 5
-  double R5;     // R coordinate of poloidal field-coil 5 (read from namelist)
-  double Z5;     // Z coordinate of poloidal field-coil 5 (read from namelist)
-  double dR5;    // Size of poloidal field-coil 5 (read from namelist)
-  double W5;     // Relative current in poloidal field-coil 5 (read from namelist)
+  double R5;     // R coordinate of poloidal field-coil 5 (read from JSON file)
+  double Z5;     // Z coordinate of poloidal field-coil 5 (read from JSON file)
+  double dR5;    // Size of poloidal field-coil 5 (read from JSON file)
+  double W5;     // Relative current in poloidal field-coil 5 (read from JSON file)
   double It5;    // Actual current in poloidal field-coil 5
 
   Coil   coil6;  // Poloidal field-coil 6
-  double R6;     // R coordinate of poloidal field-coil 6 (read from namelist)
-  double Z6;     // Z coordinate of poloidal field-coil 6 (read from namelist)
-  double dR6;    // Size of poloidal field-coil 6 (read from namelist)
-  double W6;     // Relative current in poloidal field-coil 6 (read from namelist)
+  double R6;     // R coordinate of poloidal field-coil 6 (read from JSON file)
+  double Z6;     // Z coordinate of poloidal field-coil 6 (read from JSON file)
+  double dR6;    // Size of poloidal field-coil 6 (read from JSON file)
+  double W6;     // Relative current in poloidal field-coil 6 (read from JSON file)
   double It6;    // Actual current in poloidal field-coil 6
   
   // ----------------------
@@ -231,10 +219,10 @@ class Equilibrium
   // -------------------------------
   // Adaptive integration parameters
   // -------------------------------
-  double acc;     // Integration accuracy (read from namelist)
-  double h0;      // Initial step-length (read from namelist)
-  double hmin;    // Minimum step-length (read from namelist)
-  double hmax;    // Maximum step-length (read from namelist)
+  double acc;     // Integration accuracy (read from JSON file)
+  double h0;      // Initial step-length (read from JSON file)
+  double hmin;    // Minimum step-length (read from JSON file)
+  double hmax;    // Maximum step-length (read from JSON file)
   int    maxrept; // Maximum number of step recalculations
   int    flag;    // Integration error calcualation flag
 
@@ -296,6 +284,8 @@ private:
   // Ridder's method for finding root of F(x) = 0
   void Ridder (double, double, double, double, double&);
 
+  // Read JSON file
+  json ReadJSONFile (const string& filename);
   // Open new file for writing
   FILE* OpenFilew (char* filename);
   // Open file for reading
